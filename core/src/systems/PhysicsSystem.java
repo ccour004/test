@@ -108,6 +108,7 @@ public class PhysicsSystem extends BaseEntitySystem {
         if(entity.mass == 0){
             entity.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
             entity.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
+            //entity.constructionInfo.setFriction(0.9f);
         }
         world.addRigidBody(entity.rigidBody);
     }
