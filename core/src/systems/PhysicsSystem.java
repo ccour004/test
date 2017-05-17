@@ -5,7 +5,9 @@ import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
@@ -35,8 +37,7 @@ public class PhysicsSystem extends BaseEntitySystem {
 
     static int MAX_SUB_STEPS = 5;
     static float FIXED_TIME_STEP = 1f/60f;
-
-    final float GRAVITY_CONSTANT = -6 /*-10*/;
+    final float GRAVITY_CONSTANT = -9.8f;
 
     btDynamicsWorld world;
     btConstraintSolver solver;
@@ -61,8 +62,8 @@ public class PhysicsSystem extends BaseEntitySystem {
 
     @Override
     protected void processSystem() {
-        float delta = /*Math.min(1f/30f, */Gdx.graphics.getDeltaTime()/*)*/;
-        world.stepSimulation(delta,/*MAX_SUB_STEPS,FIXED_TIME_STEP*/10);
+        float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
+        world.stepSimulation(delta,MAX_SUB_STEPS,FIXED_TIME_STEP);
     }
 
     @Override
@@ -105,12 +106,25 @@ public class PhysicsSystem extends BaseEntitySystem {
         entity.constructionInfo =
                 new btRigidBody.btRigidBodyConstructionInfo(entity.mass,entity.motionState,entity.collisionShape,entity.localInertia);
         entity.rigidBody = new btRigidBody(entity.constructionInfo);
+        entity.rigidBody.setRollingFriction(0.2f);
+        entity.rigidBody.setFriction(2);
+
         if(entity.mass == 0){
             entity.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
             entity.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
-            //entity.constructionInfo.setFriction(0.9f);
+            entity.rigidBody.setFriction(2);
+            entity.rigidBody.setRollingFriction(0.2f);
         }
         world.addRigidBody(entity.rigidBody);
+    }
+
+    public static void addObstruction(Vector3 pos,Vector3 dim,int id){
+        PrimitiveShape primitiveShape = primitives.create(id);
+        primitiveShape.pos = pos;
+        primitiveShape.dim = dim;
+        primitiveShape.prim = PhysicsSystem.PRIMITIVE.BOX;
+        primitiveShape.mat = new Material(ColorAttribute.createDiffuse(1,1,1,1));
+        primitiveShape.mass = 0;
     }
 
     @Override

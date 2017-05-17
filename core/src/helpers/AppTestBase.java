@@ -10,11 +10,13 @@ import systems.RenderingSystem;
 
 public class AppTestBase extends ApplicationAdapter {
     protected World world;
+    protected RenderingSystem renderer;
 
     @Override
     public void create () {
+        renderer = new RenderingSystem();
         world = new World(new WorldConfigurationBuilder()
-                .with(new RenderingSystem(),new PhysicsSystem())
+                .with(renderer,new PhysicsSystem())
                 .build());
     }
 
@@ -28,4 +30,7 @@ public class AppTestBase extends ApplicationAdapter {
     public void dispose () {
         world.dispose();
     }
+
+    @Override
+    public void resize (int width, int height) {renderer.resize(width,height);}
 }
